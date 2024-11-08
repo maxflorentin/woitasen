@@ -1,53 +1,30 @@
-provider "aws" {
-  region     = "eu-west-1"
-  access_key = "test"
-  secret_key = "test"
-  endpoints {
-    s3  = "http://s3.localhost.localstack.cloud:4566"
-    iam = "http://localhost:4566"
-    sts = "http://localhost:4566"
+data "aws_vpc" "main" {
+  filter {
+    name   = "tag:Name"
+    values = ["vpc-0e7f8cc4da6772325"]
   }
 }
 
-terraform {
-  backend "s3" {
-    bucket                      = "challenge"
-    key                         = "localstack"
-    region                      = "eu-west-1"
-    dynamodb_table              = "terraform-lock-table"
-    skip_metadata_api_check     = true
-    skip_credentials_validation = true
-    iam_endpoint                = "http://localhost:4566"
-    sts_endpoint                = "http://localhost:4566"
-    endpoint                    = "http://s3.localhost.localstack.cloud:4566"
-    access_key                  = "test"
-    secret_key                  = "test"
+# data.tf del root module
+data "aws_subnets" "public" {
+  filter {
+    name   = "tag:Name"
+    values = ["public-*"]
   }
 }
 
-module "backend_s3" {
-  source         = "./modules/backend_s3"
-  bucket         = "challenge"
-  key            = "localstack"
-  region         = "eu-west-1"
-  dynamodb_table = "terraform-lock-table"
-  access_key     = "test"
-  secret_key     = "test"
+data "aws_subnets" "private" {
+  filter {
+    name   = "tag:Name"
+    values = ["private-*"]
+  }
 }
 
-module "vpc" {
-  source               = "./modules/vpc"
-  vpc_cidr_block       = "10.0.0.0/16"
-  public_subnet_1_cidr = "10.0.1.0/24"
-  public_subnet_2_cidr = "10.0.2.0/24"
-  az_1                 = "eu-west-1a"
-  az_2                 = "eu-west-1b"
-}
-
-resource "aws_lb" "app_lb" {
-  name               = "app-lb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [module.vpc.security_group_id]
-  subnets            = module.vpc.subnet_ids
+module "ecs_fargate_app" {
+  source          = "./modules/ecs"
+  vpc_id          = data.aws_vpc.main.id
+  public_subnets  = data.aws_subnets.public.ids
+  private_subnets = data.aws_subnets.private.ids
+  app_name        = "challenge-app"
+  desired_count   = 2
 }
