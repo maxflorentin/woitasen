@@ -9,5 +9,10 @@ terraform {
 
 provider "aws" {
   region  = "us-east-1"
-  profile = "lahuen-devops"
+  profile = var.AWS_PROFILE
+}
+
+variable "AWS_PROFILE" {
+  default = "lahuen-devops"
+  type    = string
 }
