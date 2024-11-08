@@ -1,0 +1,21 @@
+## Requirements
+
+### Infrastructure with Terraform
+
+Use Terraform to create a modular setup.
+Implement remote state with S3 and DynamoDB for state locking.
+
+### ECS and Load Balancing
+
+Deploy a containerized web app (e.g., NGINX) on ECS Fargate.
+Configure auto-scaling for the ECS tasks (min 1, max 3).
+Use an Application Load Balancer (ALB) for traffic distribution.
+
+### Networking and Security
+
+Set up a VPC with public/private subnets across multiple AZs.
+Use security groups to allow only HTTP/HTTPS traffic from the ALB.
+Configure IAM roles for ECS tasks with least privilege permissions.
+
+### Optional (Bonus): Monitoring and Alarms
+Set up basic CloudWatch alarms for ECS (e.g., CPU and memory).

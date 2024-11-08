@@ -9,3 +9,7 @@ output "ecs_service_name" {
 output "alb_dns_name" {
   value = aws_lb.app_lb.dns_name
 }
+
+output "cluster_name" {
+  value = aws_ecs_cluster.app_cluster.name
+}

@@ -5,7 +5,6 @@ data "aws_vpc" "main" {
   }
 }
 
-# data.tf del root module
 data "aws_subnets" "public" {
   filter {
     name   = "tag:Name"
@@ -20,6 +19,10 @@ data "aws_subnets" "private" {
   }
 }
 
+data "aws_sns_topic" "my_sns_topic" {
+  name = "my-sns-topic"
+}
+
 module "ecs_fargate_app" {
   source          = "./modules/ecs"
   vpc_id          = data.aws_vpc.main.id
@@ -27,4 +30,14 @@ module "ecs_fargate_app" {
   private_subnets = data.aws_subnets.private.ids
   app_name        = "challenge-app"
   desired_count   = 2
+}
+
+module "cloudwatch_alarms" {
+  source           = "./modules/monitoring"
+  app_name         = "challenge-app"
+  cluster_name     = module.ecs_fargate_app.cluster_name
+  service_name     = module.ecs_fargate_app.ecs_service_name
+  cpu_threshold    = 80
+  memory_threshold = 85
+  alarm_actions    = [data.aws_sns_topic.my_sns_topic.arn]
 }

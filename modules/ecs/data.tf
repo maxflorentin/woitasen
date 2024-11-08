@@ -1,4 +1,3 @@
-# Obtener información de la VPC
 data "aws_vpc" "main" {
   default = true
 }
