@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "woitasen"
+version = "0.1.0"
+description = ""
+authors = ["Maximiliano Florentin <macsee13@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+tofu = "^1.8.1"
+opentofu-local = "^1.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
